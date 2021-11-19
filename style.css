@@ -1,7 +1,22 @@
-button {
-    width: 100%;
-}
-
 .hidden {
     display: none;
   }
+
+#btnContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+button {
+    width: 15em;
+}
+
+@media only screen and (min-width: 900px) {
+    #btnContainer {
+      flex-direction: row;
+      width: 60%;
+      flex-wrap: wrap;
+    }
+}
