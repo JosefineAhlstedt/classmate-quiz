@@ -199,6 +199,7 @@ const classmate = function () {
 	let img = document.querySelector("#image");
 	let link = img.getAttribute("src");
 	img.setAttribute("src", link+=students[0].image);
+    img.classList.remove("hidden");
 
 	//Randomize answers
 	//Array with placement
@@ -206,13 +207,15 @@ const classmate = function () {
 	//Shuffle it
 	shuffleArray(placement);
 
+
 	//Loop the shuffled placement array 
 	//and create a button wich contains the names of the students that has the
 	//index 0,1,2,3 in the shuffled student array. 
 	placement.forEach(element => {
 		let namn= students[element].name;
+		let nameNoSpace = namn.replace(/\s/g, '');
 		let container = document.querySelector("#btnContainer");
-		container.innerHTML+=`<button type="button" data-name="${namn}" class="btn btn-dark m-1">${students[element].name}</button>`
+		container.innerHTML+=`<button type="button" id="${nameNoSpace}" data-name="${namn}" class="btn btn-dark m-1">${students[element].name}</button>`
 	}); 
 	
 }
@@ -223,42 +226,96 @@ classmate();
 //Save how many tries we´ve made and how many correct answers
 let tries=0;
 let correct=0;
+let highscore=0;
 
 //Save the "make a guess" button
 let makeGuess = document.querySelector("#btnContainer");
+//Save if we clicked on the button
+let clicked = 0;
 
 makeGuess.addEventListener('click', e => {
-	tries++;
-	console.log(tries);
-	if (tries<20) {
+	if (e.target.tagName == "BUTTON" && tries<3 ) {
+		clicked++;
 		let clickedOn=e.target.dataset.name;
 		let rightAnswer= students[0].name;
-		if (clickedOn===rightAnswer) {
+		let rightAnswerId= rightAnswer.replace(/\s/g, '');
+		if (clickedOn===rightAnswer && clicked===1) {
+            console.log('check');
+			tries++;
 			correct++;
+			e.target.classList.replace("btn-dark", "btn-success");
 			console.log('YAY!');
-		} else {
+		} else if (clickedOn!==rightAnswer && clicked===1){
+            console.log('check');
+			tries++;
+			e.target.classList.replace("btn-dark", "btn-danger");
 			console.log('Oh no');
+			let rightBtn = document.querySelector(`#${rightAnswerId}`);
+			console.log(`${rightAnswerId}`);
+			rightBtn.classList.replace("btn-dark", "btn-success");
 		}
-		//Empty answers
-		let container = document.querySelector("#btnContainer");
-		container.innerHTML=``;
-
-		let img = document.querySelector("#image");
-		let link = img.getAttribute("src");
-		img.setAttribute("src", "students/");
-		classmate();
 		
-	} else {
-		//Empty answers
-		let container = document.querySelector("#btnContainer");
-		container.innerHTML=``;
-
-		let img = document.querySelector("#image");
-		img.remove();
-		document.querySelector("#title").innerHTML=`You got ${correct}/${tries}`;
-	}
+	} 
+	console.log(tries);
 
 });
 
+let next = document.querySelector("#next");
 
+next.addEventListener('click', e => {
+    if (tries<3) {
+        clicked=0;
+	    let container = document.querySelector("#btnContainer");
+	    container.innerHTML=``;
 
+	    let img = document.querySelector("#image");
+	    let link = img.getAttribute("src");
+	    img.setAttribute("src", "students/");
+	    classmate();
+    } else if (e.target.tagName == "BUTTON" && tries===3){
+		//Empty answers
+		let container = document.querySelector("#btnContainer");
+		container.innerHTML=``;
+
+        //Hide image
+		let img = document.querySelector("#image");
+		img.setAttribute("src", "students/");
+        img.classList.add("hidden");
+
+        //Show the results
+		document.querySelector("#title").innerHTML=`You got ${correct}/${tries}`;
+        if (highscore===0){
+            highscore=correct;
+            document.querySelector("#highscore").innerHTML=` This is your first highscore: ${highscore}`;
+        } else if (highscore<correct) {
+            highscore=correct;
+            document.querySelector("#highscore").innerHTML=` Yay new highscore!! Wich is.. ${highscore}!`;
+        } else {
+            document.querySelector("#highscore").innerHTML=` Sadly no new highscore, but the current one is: ${highscore}!`;
+        }
+
+        //Hide the "next" button
+        next.classList.add("hidden");
+        //Create a "new game" button
+        document.querySelector("#gameContainer").innerHTML+=`<button id="new" type="button" class="btn btn-dark m-1">New Game?</button>`
+
+        //Start a new game
+        document.querySelector("#new").addEventListener('click', e => {
+            clicked = 0;
+            //Reset the containers and variables
+            let container = document.querySelector("#btnContainer");
+            container.innerHTML=``;
+            document.querySelector("#title").innerHTML='';
+            document.querySelector("#highscore").innerHTML='';
+            document.querySelector("#new").remove();
+            next.classList.remove("hidden");
+
+            tries=0;
+            correct=0;
+            //Initiate the game
+            classmate();
+        })
+
+	}
+		
+});
