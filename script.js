@@ -190,33 +190,37 @@ const shuffleArray = array => {
 	}
   }
 
+  let clones = [...students];
+  let rightStudent;
+
 //Function that produces a classmate
 const classmate = function () {
 	//Shuffle the student array
-	shuffleArray(students);
+	shuffleArray(clones);
+    rightStudent = clones[0];
+    console.log(rightStudent);
 
 	//get and attach img to "card"
 	let img = document.querySelector("#image");
 	let link = img.getAttribute("src");
-	img.setAttribute("src", link+=students[0].image);
+	img.setAttribute("src", link+=clones[0].image);
     img.classList.remove("hidden");
 
-	//Randomize answers
-	//Array with placement
-	const placement = [0, 1, 2, 3];
-	//Shuffle it
-	shuffleArray(placement);
-
+    let slicedStudents = clones.slice(0,4).map(student => student.name);
+    shuffleArray(slicedStudents);
+    console.log(slicedStudents);
 
 	//Loop the shuffled placement array 
 	//and create a button wich contains the names of the students that has the
 	//index 0,1,2,3 in the shuffled student array. 
-	placement.forEach(element => {
-		let namn= students[element].name;
+	slicedStudents.forEach(element => {
+		let namn= element;
 		let nameNoSpace = namn.replace(/\s/g, '');
 		let container = document.querySelector("#btnContainer");
-		container.innerHTML+=`<button type="button" id="${nameNoSpace}" data-name="${namn}" class="btn btn-dark m-1">${students[element].name}</button>`
+		container.innerHTML+=`<button type="button" id="${nameNoSpace}" data-name="${namn}" class="btn btn-dark m-1">${element}</button>`
 	}); 
+    clones = clones.filter(student => student !== rightStudent);
+    console.log(clones);
 	
 }
 
@@ -234,10 +238,10 @@ let makeGuess = document.querySelector("#btnContainer");
 let clicked = 0;
 
 makeGuess.addEventListener('click', e => {
-	if (e.target.tagName == "BUTTON" && tries<3 ) {
+	if (e.target.tagName == "BUTTON" && tries<10 ) {
 		clicked++;
 		let clickedOn=e.target.dataset.name;
-		let rightAnswer= students[0].name;
+		let rightAnswer= rightStudent.name;
 		let rightAnswerId= rightAnswer.replace(/\s/g, '');
 		if (clickedOn===rightAnswer && clicked===1) {
             console.log('check');
@@ -263,7 +267,7 @@ makeGuess.addEventListener('click', e => {
 let next = document.querySelector("#next");
 
 next.addEventListener('click', e => {
-    if (tries<3) {
+    if (tries<10) {
         clicked=0;
 	    let container = document.querySelector("#btnContainer");
 	    container.innerHTML=``;
@@ -272,7 +276,7 @@ next.addEventListener('click', e => {
 	    let link = img.getAttribute("src");
 	    img.setAttribute("src", "students/");
 	    classmate();
-    } else if (e.target.tagName == "BUTTON" && tries===3){
+    } else if (e.target.tagName == "BUTTON" && tries===10){
 		//Empty answers
 		let container = document.querySelector("#btnContainer");
 		container.innerHTML=``;
@@ -312,6 +316,7 @@ next.addEventListener('click', e => {
 
             tries=0;
             correct=0;
+            clones = [...students];
             //Initiate the game
             classmate();
         })
