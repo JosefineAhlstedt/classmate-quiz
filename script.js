@@ -236,7 +236,7 @@ let clicked = 0;
 
 //Showing right and wrong answer while making a guess
 makeGuess.addEventListener('click', e => {
-	if (e.target.tagName == "BUTTON" && tries<3 ) {
+	if (e.target.tagName == "BUTTON" && tries<10 ) {
 		clicked++;
 		let clickedOn=e.target.dataset.name;
 		let rightAnswer= rightStudent.name;
@@ -260,7 +260,7 @@ let next = document.querySelector("#next");
 //When you click on next (and your guesses are under 10) empty the button container and the image
 //while also initiating a new classmate
 next.addEventListener('click', e => {
-    if (tries<3) {
+    if (tries<10) {
         clicked=0;
 	    let container = document.querySelector("#btnContainer");
 	    container.innerHTML=``;
@@ -270,7 +270,7 @@ next.addEventListener('click', e => {
 	    img.setAttribute("src", "");
 	    classmate();
         //If yuor guesses are up, also empty the button container and image while also showing the resluts
-    } else if (e.target.tagName == "BUTTON" && tries===3){
+    } else if (e.target.tagName == "BUTTON" && tries===10){
 		let container = document.querySelector("#btnContainer");
 		container.innerHTML=``;
 
