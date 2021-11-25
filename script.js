@@ -189,45 +189,42 @@ const shuffleArray = array => {
 	  array[j] = temp;
 	}
   }
-
-  let clones = [...students];
-  let rightStudent;
+//Making a clone of the students array
+let clones = [...students];
+//Preparing to save the right stiudent
+let rightStudent;
 
 //Function that produces a classmate
 const classmate = function () {
-	//Shuffle the student array
+	//Shuffle the clones array and saving the right student
 	shuffleArray(clones);
     rightStudent = clones[0];
-    console.log(rightStudent);
 
 	//get and attach img to "card"
 	let img = document.querySelector("#image");
 	let link = img.getAttribute("src");
 	img.setAttribute("src", link+=clones[0].image);
-    img.classList.remove("hidden");
 
+    //Take the first four students in the cloned array and shuffle it
     let slicedStudents = clones.slice(0,4).map(student => student.name);
     shuffleArray(slicedStudents);
-    console.log(slicedStudents);
 
-	//Loop the shuffled placement array 
-	//and create a button wich contains the names of the students that has the
-	//index 0,1,2,3 in the shuffled student array. 
+    //Loop through the shuffled sliced array and create a button for each student
+    //I also ad an ID for each student to be able to get the right student button
 	slicedStudents.forEach(element => {
 		let namn= element;
 		let nameNoSpace = namn.replace(/\s/g, '');
 		let container = document.querySelector("#btnContainer");
 		container.innerHTML+=`<button type="button" id="${nameNoSpace}" data-name="${namn}" class="btn btn-dark m-1">${element}</button>`
 	}); 
+    //Filter out the right student so that we do not get it a second time
     clones = clones.filter(student => student !== rightStudent);
-    console.log(clones);
-	
 }
 
-//Initiate function
+//Initiate function so that we get a new classmate
 classmate();
 
-//Save how many tries we´ve made and how many correct answers
+//Save how many tries we´ve made, highscore and how many correct answers we have
 let tries=0;
 let correct=0;
 let highscore=0;
@@ -237,57 +234,53 @@ let makeGuess = document.querySelector("#btnContainer");
 //Save if we clicked on the button
 let clicked = 0;
 
+//Showing right and wrong answer while making a guess
 makeGuess.addEventListener('click', e => {
-	if (e.target.tagName == "BUTTON" && tries<10 ) {
+	if (e.target.tagName == "BUTTON" && tries<3 ) {
 		clicked++;
 		let clickedOn=e.target.dataset.name;
 		let rightAnswer= rightStudent.name;
 		let rightAnswerId= rightAnswer.replace(/\s/g, '');
 		if (clickedOn===rightAnswer && clicked===1) {
-            console.log('check');
 			tries++;
 			correct++;
 			e.target.classList.replace("btn-dark", "btn-success");
-			console.log('YAY!');
 		} else if (clickedOn!==rightAnswer && clicked===1){
-            console.log('check');
 			tries++;
 			e.target.classList.replace("btn-dark", "btn-danger");
-			console.log('Oh no');
 			let rightBtn = document.querySelector(`#${rightAnswerId}`);
-			console.log(`${rightAnswerId}`);
 			rightBtn.classList.replace("btn-dark", "btn-success");
 		}
-		
 	} 
-	console.log(tries);
-
 });
 
+//saving the "next" button
 let next = document.querySelector("#next");
 
+//When you click on next (and your guesses are under 10) empty the button container and the image
+//while also initiating a new classmate
 next.addEventListener('click', e => {
-    if (tries<10) {
+    if (tries<3) {
         clicked=0;
 	    let container = document.querySelector("#btnContainer");
 	    container.innerHTML=``;
 
 	    let img = document.querySelector("#image");
 	    let link = img.getAttribute("src");
-	    img.setAttribute("src", "students/");
+	    img.setAttribute("src", "");
 	    classmate();
-    } else if (e.target.tagName == "BUTTON" && tries===10){
-		//Empty answers
+        //If yuor guesses are up, also empty the button container and image while also showing the resluts
+    } else if (e.target.tagName == "BUTTON" && tries===3){
 		let container = document.querySelector("#btnContainer");
 		container.innerHTML=``;
 
-        //Hide image
 		let img = document.querySelector("#image");
-		img.setAttribute("src", "students/");
-        img.classList.add("hidden");
+		img.setAttribute("src", "");
 
         //Show the results
 		document.querySelector("#title").innerHTML=`You got ${correct}/${tries}`;
+
+        //Check highscore
         if (highscore===0){
             highscore=correct;
             document.querySelector("#highscore").innerHTML=` This is your first highscore: ${highscore}`;
@@ -305,6 +298,7 @@ next.addEventListener('click', e => {
 
         //Start a new game
         document.querySelector("#new").addEventListener('click', e => {
+            //reset clicked
             clicked = 0;
             //Reset the containers and variables
             let container = document.querySelector("#btnContainer");
@@ -316,11 +310,10 @@ next.addEventListener('click', e => {
 
             tries=0;
             correct=0;
+            //Reeassign clones again so that I get the filtered students back
             clones = [...students];
             //Initiate the game
             classmate();
         })
-
-	}
-		
+	}	
 });
